@@ -156,10 +156,14 @@ Item {
     }
 
     function call(method, args) {
-        message = ""
         try {
-            bridge.call(method, args)
-            refresh()
+            const response = JSON.parse(bridge.call(method, args))
+            if (response.status === "submitted") {
+                message = "Deposit confirmed. Transaction " + response.data.tx_hash
+                refresh()
+            } else {
+                message = response.error || "The ledger did not submit the confirmation."
+            }
         } catch (e) { message = "Error: " + e }
     }
 }

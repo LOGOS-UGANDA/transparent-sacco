@@ -20,7 +20,7 @@ Item {
 
     function callCore(method, args) {
         try {
-            lastResult = logos.callModule("sacco_core", method, args)
+            lastResult = bridge.call(method, args)
         } catch (e) {
             lastResult = "Error: " + e
         }
@@ -31,7 +31,18 @@ Item {
     // Bridge the scaffold's callModule API to the view-level `call(method, args)`.
     property var bridge: QtObject {
         function call(method, args) {
-            return logos.callModule("sacco_core", method, args)
+            const raw = logos.callModule("sacco_core", method, args)
+            if (typeof raw !== "string") {
+                root.lastResult = JSON.stringify(raw)
+                return root.lastResult
+            }
+            try {
+                const decoded = JSON.parse(raw)
+                root.lastResult = typeof decoded === "string" ? decoded : JSON.stringify(decoded)
+            } catch (e) {
+                root.lastResult = raw
+            }
+            return root.lastResult
         }
     }
 
@@ -96,9 +107,27 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.minimumHeight: 180
-            MemberView { bridge: root.bridge }
-            CommitteeView { bridge: root.bridge }
-            AuditorView { bridge: root.bridge }
+            Loader {
+                active: roleTabs.currentIndex === 0
+                source: "MemberView.qml"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onLoaded: item.bridge = root.bridge
+            }
+            Loader {
+                active: roleTabs.currentIndex === 1
+                source: "CommitteeView.qml"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onLoaded: item.bridge = root.bridge
+            }
+            Loader {
+                active: roleTabs.currentIndex === 2
+                source: "AuditorView.qml"
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onLoaded: item.bridge = root.bridge
+            }
         }
 
         GroupBox {
