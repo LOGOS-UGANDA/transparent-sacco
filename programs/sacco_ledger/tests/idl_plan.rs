@@ -17,6 +17,26 @@ fn initialize_config_pda_is_not_a_signer() {
     assert!(!INSTRUCTIONS[0].accounts[0].signer);
 }
 
+#[test]
+fn confirm_deposit_marks_only_the_member_identity_as_signer() {
+    let instruction = INSTRUCTIONS
+        .iter()
+        .find(|instruction| instruction.name == "confirm_deposit")
+        .expect("ConfirmDeposit IDL entry");
+    let accounts = instruction.accounts;
+
+    assert_eq!(accounts.len(), 3);
+    assert_eq!(accounts[0].name, "deposit");
+    assert!(accounts[0].writable);
+    assert!(!accounts[0].signer);
+    assert_eq!(accounts[1].name, "member_account");
+    assert!(!accounts[1].writable);
+    assert!(!accounts[1].signer);
+    assert_eq!(accounts[2].name, "member_signer");
+    assert!(!accounts[2].writable);
+    assert!(accounts[2].signer);
+}
+
 fn samples() -> Vec<Instruction> {
     let id = AccountId::new([7; 32]);
     vec![

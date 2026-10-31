@@ -15,12 +15,16 @@ Item {
     property string message: ""
 
     function refresh() {
-        if (!bridge || memberAccount === "") return
+        if (!bridge) return
         try {
             const sacco = JSON.parse(bridge.call("getSacco", []))
-            const member = JSON.parse(bridge.call("getMember", [memberAccount]))
             saccoTotals = sacco.data ? (sacco.data.state || sacco.data) : ({})
-            myMember = member.data ? (member.data.state || member.data) : ({})
+            if (memberAccount !== "") {
+                const member = JSON.parse(bridge.call("getMember", [memberAccount]))
+                myMember = member.data ? (member.data.state || member.data) : ({})
+            } else {
+                myMember = ({})
+            }
             if (depositAccount !== "") {
                 const deposit = JSON.parse(bridge.call("getDeposit", [depositAccount]))
                 myDeposit = deposit.data ? (deposit.data.state || deposit.data) : ({})
@@ -28,7 +32,7 @@ Item {
                 myDeposit = ({})
             }
             myLoans = []
-            if (sacco.status === "indexed_metadata_only" || member.status === "indexed_metadata_only")
+            if (sacco.status === "indexed_metadata_only")
                 message = "The indexer sees these accounts, but its current API omits shard bytes, so balances and deposit records cannot be decoded yet."
             else
                 message = ""
@@ -120,6 +124,7 @@ Item {
                 Button {
                     text: "Confirm deposit"
                     enabled: Object.keys(root.myDeposit).length > 0
+                             && root.memberAccount !== ""
                              && !root.myDeposit.confirmed_by_member
                     onClicked: root.call("confirmDeposit", [root.depositAccount, root.memberAccount])
                 }
@@ -160,7 +165,6 @@ Item {
             const response = JSON.parse(bridge.call(method, args))
             if (response.status === "submitted") {
                 message = "Deposit confirmed. Transaction " + response.data.tx_hash
-                refresh()
             } else {
                 message = response.error || "The ledger did not submit the confirmation."
             }
