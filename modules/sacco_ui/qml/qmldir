@@ -1,0 +1,4 @@
+module com.logos.module.sacco_ui
+MemberView 1.0 MemberView.qml
+CommitteeView 1.0 CommitteeView.qml
+AuditorView 1.0 AuditorView.qml

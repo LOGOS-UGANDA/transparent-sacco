@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <memory>
 #include <stdexcept>
 
@@ -376,7 +377,18 @@ std::string SaccoCoreImpl::readIndexedAccount(const std::string& kind,
             : modules().lez_core.account_id_from_base58(accountId);
         const json account = json::parse(modules().lez_core.get_account_public(id), nullptr, false);
         if (!account.is_object()) return errorJson("sequencer account is unavailable or still syncing");
-        const json shards = account.value("shards", json::array());
+        const json* accountData = &account;
+        if (account.contains("data") && account["data"].is_object()) {
+            accountData = &account["data"];
+        }
+        const json shards = accountData->value("shards", json::array());
+        const auto decodeBytes = [&kind](const json& bytes) -> json {
+            if (!bytes.is_array()) return json();
+            const json request = {{"kind", kind}, {"bytes", bytes}};
+            const json decoded = json::parse(
+                rustResult(sacco_ledger_decode_shard_json(request.dump().c_str())), nullptr, false);
+            return decoded.is_object() ? decoded : json();
+        };
         if (shards.is_array()) {
             for (const auto& shard : shards) {
                 if (!shard.is_object() || !shard.contains("data") || !shard["data"].is_string()) continue;
@@ -393,10 +405,33 @@ std::string SaccoCoreImpl::readIndexedAccount(const std::string& kind,
                     }
                 }
                 if (!valid) continue;
-                const json request = {{"kind", kind}, {"bytes", bytes}};
-                const json decoded = json::parse(
-                    rustResult(sacco_ledger_decode_shard_json(request.dump().c_str())), nullptr, false);
-                if (decoded.is_object()) return resultJson("sequencer", decoded);
+                const json decoded = decodeBytes(bytes);
+                if (!decoded.is_null()) return resultJson("sequencer", decoded);
+            }
+        } else if (shards.is_object()) {
+            for (auto shard = shards.begin(); shard != shards.end(); ++shard) {
+                const json* bytes = &shard.value();
+                if (bytes->is_object() && bytes->contains("data")) bytes = &(*bytes)["data"];
+                if (bytes->is_array()) {
+                    const json decoded = decodeBytes(*bytes);
+                    if (!decoded.is_null()) return resultJson("sequencer", decoded);
+                } else if (bytes->is_string()) {
+                    const std::string hex = bytes->get<std::string>();
+                    if (hex.size() % 2 != 0) continue;
+                    json byteArray = json::array();
+                    bool valid = true;
+                    for (std::size_t offset = 0; offset < hex.size(); offset += 2) {
+                        try {
+                            byteArray.push_back(std::stoi(hex.substr(offset, 2), nullptr, 16));
+                        } catch (...) {
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (!valid) continue;
+                    const json decoded = decodeBytes(byteArray);
+                    if (!decoded.is_null()) return resultJson("sequencer", decoded);
+                }
             }
         }
         return resultJson("sequencer_account", {{"account_id", id}, {"account", account},
@@ -492,8 +527,18 @@ std::string SaccoCoreImpl::dispatchInstruction(const std::string& instruction,
             }
         }
         if (!isHexAccountId(accountId)) return errorJson("missing or invalid IDL account input: " + accountName);
-        accountIds.push_back(accountId);
-        signerRequirements.push_back(spec.value("signer", false));
+        const auto duplicate = std::find(accountIds.begin(), accountIds.end(), accountId);
+        if (duplicate == accountIds.end()) {
+            accountIds.push_back(accountId);
+            signerRequirements.push_back(spec.value("signer", false));
+        } else {
+            const auto index = static_cast<std::size_t>(std::distance(accountIds.begin(), duplicate));
+            // A ledger identity can appear twice in the IDL when an account is
+            // both referenced as data and required as a signer (ConfirmDeposit).
+            // LEZ accepts one mention per identity, with the strongest signer
+            // requirement applied to that single mention.
+            signerRequirements[index] = signerRequirements[index] || spec.value("signer", false);
+        }
     }
     if (accountIds.empty()) return errorJson("Rust IDL declared no transaction accounts");
 
