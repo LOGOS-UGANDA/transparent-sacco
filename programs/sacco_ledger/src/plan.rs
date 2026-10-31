@@ -155,9 +155,16 @@ pub fn plan(input: &PlanInput, instruction: Instruction) -> Plan {
             );
         }
         Instruction::ConfirmDeposit => {
-            let [deposit, member_account, member_signer] =
-                <&[_; 3]>::try_from(input.accounts.as_slice())
-                    .expect("ConfirmDeposit requires deposit, member and member signer");
+            // The LEZ wallet API accepts one mention per account identity. If
+            // the member ledger account is the member's identity account, the
+            // core merges those two IDL entries and promotes that mention to a
+            // signer. Accept that two-account form and use the same authorized
+            // account for both roles.
+            let (deposit, member_account, member_signer) = match input.accounts.as_slice() {
+                [deposit, member] => (deposit, member, member),
+                [deposit, member, signer] => (deposit, member, signer),
+                _ => panic!("ConfirmDeposit requires deposit, member and member signer"),
+            };
             let signer = signer(member_signer, "Member must authorize confirmation");
             plan.effect(
                 member_account,

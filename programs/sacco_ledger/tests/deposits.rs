@@ -138,6 +138,20 @@ fn confirm_deposit_flips_member_confirmation() {
 }
 
 #[test]
+fn confirm_deposit_accepts_merged_member_account_and_identity_signer() {
+    let mut ledger = Ledger::new();
+    verified_sacco(&mut ledger);
+    add_verified_member(&mut ledger, aid(6));
+    record(&mut ledger, 7);
+
+    // LEZ permits a single mention per identity, so the member record and its
+    // signer are represented by the same authorized account handle.
+    ledger.execute(&[meta(aid(7)), meta(aid(6))], Instruction::ConfirmDeposit);
+
+    assert!(ledger.deposit(aid(7)).confirmed_by_member);
+}
+
+#[test]
 #[should_panic(expected = "Only the member can confirm their deposit")]
 fn confirm_deposit_member_only() {
     let mut ledger = Ledger::new();
