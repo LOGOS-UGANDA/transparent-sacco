@@ -10,13 +10,14 @@
 
 Transparent SACCO is a Logos-native **SACCO ledger**: every deposit, loan and expense a savings and credit cooperative handles is recorded and approved on the [Logos Execution Zone (LEZ)](https://docs.logos.co/), with multi-signature approval before any expense passes and members' personal balances kept private. It ships both as a **standalone desktop app** and as a **Basecamp module** users install from a package repository.
 
-> **Status:** the pivot from the earlier university fee-transparency model is decided and the [pivot roadmap](./docs/roadmap-sacco-pivot.md) is the plan of record (12 steps, 8 phases). Phase 1 — the `sacco_ledger` LEZ program — is in flight on [issue #3](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/3).
+> **Status:** the `sacco_ledger` LEZ program, its local deployment, and the core and UI wiring are done (Phases 1–3): one full flow — record a deposit, the member sees and confirms it, an expense passes multi-sig — runs end to end inside Basecamp on a local sequencer. Phase 4 (privacy) is in progress. The Phase 0 pilot sign-off and baseline survey are still outstanding. See [Status](#status) for the per-phase breakdown.
 
 ## Contents
 
 - [The problem](#the-problem)
 - [The solution: a ledger, not a custodian](#the-solution-a-ledger-not-a-custodian)
 - [Architecture](#architecture-logos-native)
+- [Status](#status)
 - [Roadmap](#roadmap)
 - [Getting started](#getting-started)
 - [Repository layout](#repository-layout)
@@ -50,9 +51,9 @@ This is **not** an EVM / Solidity dApp. Logos LEZ runs RISC-V programs (RISC Zer
 ```text
 ┌─────────────────────────────────────────────────────────┐
 │  Transparent SACCO                                       │
-│  • programs/sacco_ledger      — LEZ program (in flight)  │
-│  • modules/sacco_core         — core module (APIs)       │
-│  • modules/sacco_ui           — QML UI module            │
+│  • programs/sacco_ledger      — LEZ program (local)      │
+│  • modules/sacco_core         — core module (IDL calls)  │
+│  • modules/sacco_ui           — QML UI module (3 views)  │
 └───────────────────────────┬─────────────────────────────┘
                             │
             ┌───────────────┴───────────────┐
@@ -73,6 +74,21 @@ Docs: [docs.logos.co](https://docs.logos.co/) · [Basecamp](https://logos.co/bas
 
 ---
 
+## Status
+
+Progress against the [pivot roadmap](./docs/roadmap-sacco-pivot.md). A phase is marked done only when its issue is closed and its work is merged on `main`; the roadmap's phase checklists carry the task-level detail.
+
+| Phase | Steps | Status | Issue |
+|---|---|---|---|
+| 0 · Scope and validate | 1 | Partly done. Field research, workstreams and the three-flow scope (deposits, loans, expenses) are settled. The pilot SACCO agreement and the baseline trust survey are still outstanding; the pilot kit (agreement template, metrics and survey, workstream owners) is under review in [PR #19](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/19) and is not on `main`. | [#2](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/2) (closed) |
+| 1 · Domain model and LEZ program | 2–4 | Done. `sacco_ledger` runs all 19 IDL instructions on `lee_core` v0.3.1 with per-instruction tests, a generated IDL and CI. | [#3](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/3) (closed) |
+| 2 · Upgrade and deploy | 4 | Done. Deployed to a local sequencer with `logos-scaffold` and a successful `Initialize` call recorded in [docs/deploy.md](./docs/deploy.md). Public testnet deployment is deferred by decision. | [#4](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/4) (closed) |
+| 3 · Core and UI wiring | 5–7 | Done. `sacco_core` submits IDL instructions through the LEZ wallet; Member, Committee and Auditor views run in Basecamp; the demo flow is captured in [docs/screenshots/issue-5/](./docs/screenshots/issue-5/). | [#5](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/5) (closed) |
+| 4 · Privacy | 7–8 | In progress. Design option C (group-held private accounts, with a viewing key for the Supervisory Committee) is chosen on the issue; the member privacy explainer is in review in [PR #22](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/22). Member balances are still in public accounts. | [#6](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/6) (open) |
+| 5 · Storage and Messaging | 8–9 | Not started. | [#7](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/7) (open) |
+| 6 · Package and publish | 9 | Not started. Local `.lgx` builds install into Basecamp; signed packages and the `logos-repo.json` index are not done. | [#8](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/8) (open) |
+| 7 · Pilot and report | 10–12 | Not started. | [#9](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/9) (open) |
+
 ## Roadmap
 
 The [pivot roadmap](./docs/roadmap-sacco-pivot.md) carries the full plan: 8 phases across 12 steps — domain model, deploy, core/UI wiring, privacy (private member accounts), storage and messaging (receipts by CID, member alerts), packaging, and a real-SACCO pilot with published metrics. Work is tracked as phase issues; see [CONTRIBUTING.md](./CONTRIBUTING.md) before picking one up.
@@ -81,7 +97,7 @@ The [pivot roadmap](./docs/roadmap-sacco-pivot.md) carries the full plan: 8 phas
 
 ### 1. Install Basecamp (recommended)
 
-Download from [logos.co/basecamp](https://logos.co/basecamp) and use it to explore the stack (wallet, LEZ, Package Manager) while the product is under construction.
+Download from [logos.co/basecamp](https://logos.co/basecamp) and use it to explore the stack (wallet, LEZ, Package Manager). The SACCO modules build and install into Basecamp locally; see [docs/testing.md](./docs/testing.md).
 
 ### 2. Work on the program
 
@@ -90,7 +106,7 @@ cd programs
 RISC0_DEV_MODE=1 cargo test --workspace
 ```
 
-See [docs/testing.md](./docs/testing.md) and the phase issues for what's next.
+See [docs/testing.md](./docs/testing.md) for the module and Basecamp checks, [docs/deploy.md](./docs/deploy.md) for the local deployment, and the [Status](#status) table for what's next.
 
 ### 3. Explore the earlier web prototype (optional, legacy)
 
@@ -112,14 +128,15 @@ cd prototype && npm install && npm run dev
 ├── logos-repo.json             # Basecamp package-repository entry (filled at Phase 6)
 ├── docs/
 │   ├── roadmap-sacco-pivot.md  # plan of record
-│   ├── architecture.md · idl.md · testing.md · basecamp-publishing.md
-│   ├── custody.md             # superseded proposal, historical only
+│   ├── architecture.md · idl.md · testing.md · deploy.md · basecamp-publishing.md
+│   ├── screenshots/            # Basecamp demo captures (Phase 3)
+│   ├── custody.md              # superseded proposal, historical only
 │   └── superpowers/            # dated design history; older proposals may be superseded
 ├── artifacts/                  # program IDL
 ├── programs/                   # LEZ program: sacco_ledger (attestation ledger)
 ├── modules/
-│   ├── sacco_core/             # headless core module (scaffold)
-│   └── sacco_ui/               # QML UI module (scaffold)
+│   ├── sacco_core/             # headless core module, submits IDL instructions to LEZ
+│   └── sacco_ui/               # QML UI module: Member, Committee and Auditor views
 └── prototype/                  # superseded React + Hardhat custody demo — reference only
 ```
 

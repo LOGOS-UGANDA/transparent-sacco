@@ -30,16 +30,15 @@ IDL: [idl.md](./idl.md) · [`artifacts/sacco_ledger-idl.json`](../artifacts/sacc
 
 Headless Logos module that:
 
-- Is currently a scaffold; its existing fee-payment and release methods are legacy stubs, not the current SACCO API
-- Will submit `sacco_ledger` IDL instructions to record and approve off-chain SACCO activity
-- Optionally stores evidence blobs via Logos Storage (CIDs referenced on-chain)
-- Exposes methods the UI calls over Logos IPC
+- Submits `sacco_ledger` IDL instructions through the configured LEZ wallet to record and approve off-chain SACCO activity (encoding comes from the Rust IDL client in `programs/sacco_ledger/ffi`)
+- Reads and decodes public ledger accounts from the sequencer, and account transaction history from the LEZ indexer
+- Exposes methods the UI calls over Logos IPC; see [`modules/sacco_core/API.md`](../modules/sacco_core/API.md)
+- Will store evidence blobs via Logos Storage, with CIDs referenced on chain (Phase 5, not built yet)
 
 ### UI module — `modules/sacco_ui`
 
-QML UI scaffold for future member, treasurer, committee, and auditor views. The
-current fee-payment and release controls are explicitly marked as legacy demos.
-Runs inside:
+QML UI with Member, Committee (treasurer and approvers) and Auditor views; every
+action goes through `sacco_core`. Runs inside:
 
 - **Basecamp** — discovered via Package Manager after the user adds this repo’s catalogue
 - **`logos-standalone-app`** — focused desktop binary for institutions that do not want the full shell

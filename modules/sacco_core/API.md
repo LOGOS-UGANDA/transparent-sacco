@@ -53,8 +53,15 @@ of the `Instruction` enum, for example
 The wallet signs only with account keys it owns. The program validates the
 account count, order, initialization, and signer requirements; the IDL is the
 source of truth for those checks. This client is the local LEZ transport and
-verification path; the C++ module's `dispatchInstruction()` still needs to be
-connected to it before the Basecamp UI can submit transactions.
+verification path. Inside Basecamp, the C++ module's `dispatchInstruction()`
+uses the same Rust IDL code through `programs/sacco_ledger/ffi` to encode the
+instruction and resolve its account table, then submits it through the
+configured LEZ wallet (`lez_core`).
+
+The LEZ wallet accepts one mention per account. When `member_account` and
+`member_signer` in `ConfirmDeposit` are the same account, the core merges them
+into one signing entry; the program accepts that two-account form as well as
+the three-account form.
 
 ## Reads and current limits
 
@@ -64,9 +71,13 @@ The Rust client can read and Borsh-decode a known account shard:
 sacco_ledger_local_client read <sacco|member|deposit|loan|expense|summary|config> <program-id> <account-id>
 ```
 
-This is a direct read from the configured LEZ sequencer. The current ledger has
-no account-discovery/indexer endpoint, and member shards do not retain deposit
-account IDs. Consequently, list queries (`listMyDeposits`, `listMyLoans`,
-`listPeriodSummaries`, `getAuditTrail`) need an indexer or caller-supplied account
-IDs; they cannot be implemented by guessing accounts. The C++ module queries
-remain placeholders until that read path is connected.
+This is a direct read from the configured LEZ sequencer. In the C++ module,
+the single-account queries (`getSacco`, `getMember`, `getDeposit`, `getLoan`,
+`getExpense`) read the public account through the LEZ wallet's sequencer query
+and decode its shard with the Rust IDL code.
+
+The ledger has no account-discovery endpoint, and member shards do not retain
+deposit account IDs. The list queries (`listMyDeposits`, `listMyLoans`,
+`listPeriodSummaries`, `getAuditTrail`) therefore return the account's
+transaction history from `lez_indexer_module` rather than decoded record lists;
+decoding a specific record still needs its account ID.

@@ -24,7 +24,7 @@ This guide is for **everyone who works in this repository — human contributors
 Agents are welcome here, under the same rules as humans plus the following, which exist because agents are the ones most likely to break them:
 
 1. **Read before acting.** Read this file, the roadmap, and your assigned phase issue **before** touching anything. The roadmap is the source of truth for direction; the issue is the source of truth for scope.
-2. **No repo-wide changes.** Do not reformat, restructure, or "clean up" files outside your phase's checklist. Do not rename `fee_transparency` to `sacco_ledger` unless you hold the Phase 1 issue — that rename is assigned work, not a drive-by.
+2. **No repo-wide changes.** Do not reformat, restructure, or "clean up" files outside your phase's checklist. Renames and restructures of programs or modules are assigned work, not drive-bys (the Phase 1 `fee_transparency` → `sacco_ledger` rename is done; don't reintroduce the old name).
 3. **Never force-push, never rewrite history, never push to `main`.** If your branch diverges, rebase onto `main` normally.
 4. **Do not create, close, or mass-edit issues or labels.** Issue lifecycle belongs to the phase leads. If work needs a new issue, propose it in a comment.
 5. **Run the checks you can:** for LEZ program changes, `RISC0_DEV_MODE=1 cargo test` in `programs/`; see [`docs/testing.md`](./docs/testing.md) for the rest. A change that skips its checks is not done.
@@ -36,9 +36,9 @@ Agents are welcome here, under the same rules as humans plus the following, whic
 
 | Path | What lives there |
 |---|---|
-| `docs/` | Roadmap, architecture, historical custody proposal, IDL, testing, publishing docs |
-| `programs/fee_transparency/` | LEZ program (Rust guest, RISC Zero) — becomes `sacco_ledger` in Phase 1 |
-| `modules/sacco_core/`, `modules/sacco_ui/` | Logos Core and QML UI module scaffolds |
+| `docs/` | Roadmap, architecture, historical custody proposal, IDL, testing, deploy runbook, publishing docs, demo screenshots |
+| `programs/sacco_ledger/` | LEZ program (Rust guest, RISC Zero) — the SACCO attestation ledger, renamed from `fee_transparency` in Phase 1 |
+| `modules/sacco_core/`, `modules/sacco_ui/` | Logos Core module (submits IDL instructions to LEZ) and QML UI module (Member, Committee and Auditor views) |
 | `artifacts/` | Exported program IDL |
 | `prototype/` | Earlier React + Hardhat demo — reference only, not the production path |
 | `docs/superpowers/` | Internal design and plan records for the pivot |

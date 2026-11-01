@@ -30,7 +30,7 @@ sacco_ledger/
 | `AddApprover` / `AddSupervisor` | Governance roles |
 | `SetRequiredApprovals` | Admin sets a threshold from 2 through one less than the approver count |
 | `AddMember` | Member account shard |
-| `RecordDeposit` / `ConfirmDeposit` | Savings or share-capital deposit, then member confirmation |
+| `RecordDeposit` / `ConfirmDeposit` | Savings or share-capital deposit, then member confirmation (accepts the merged two-account form when the member account also signs) |
 | `ApplyLoan` / `ApproveLoan` / `RejectLoan` | Loan application with pinned approval threshold |
 | `DisburseLoan` | Marks the loan disbursed, carrying the principal for cross-checking |
 | `RecordRepayment` | Repayment against a loan |
@@ -105,6 +105,7 @@ commands and full result for this deployment.
 
 ## Known gaps
 
-1. `sacco_core` does not submit IDL transactions yet; use the repository's
-   local client in [`docs/deploy.md`](../../docs/deploy.md) for initialization.
+1. Member, deposit and loan records are still public accounts; moving them to
+   private accounts is Phase 4 work
+   ([issue #6](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/6)).
 2. Refunds are handled off chain; the current ledger has no instruction to record a refund yet.
