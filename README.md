@@ -10,7 +10,7 @@
 
 Transparent SACCO is a Logos-native **SACCO ledger**: every deposit, loan and expense a savings and credit cooperative handles is recorded and approved on the [Logos Execution Zone (LEZ)](https://docs.logos.co/), with multi-signature approval before any expense passes and members' personal balances kept private. It ships both as a **standalone desktop app** and as a **Basecamp module** users install from a package repository.
 
-> **Status:** the `sacco_ledger` LEZ program, its local deployment, and the core and UI wiring are done (Phases 1–3): one full flow — record a deposit, the member sees and confirms it, an expense passes multi-sig — runs end to end inside Basecamp on a local sequencer. Phase 4 (privacy) is in progress. The Phase 0 pilot sign-off and baseline survey are still outstanding. See [Status](#status) for the per-phase breakdown.
+> **Status:** the `sacco_ledger` LEZ program, its local deployment, and the core and UI wiring are done (Phases 1–3): one full flow — record a deposit, the member sees and confirms it, an expense passes multi-sig — runs end to end inside Basecamp on a local sequencer. The Phase 0 pilot sign-off and baseline survey are still outstanding. See [Status](#status) for the per-phase breakdown.
 
 ## Contents
 
@@ -84,10 +84,10 @@ Progress against the [pivot roadmap](./docs/roadmap-sacco-pivot.md). A phase is 
 | 1 · Domain model and LEZ program | 2–4 | Done. `sacco_ledger` runs all 19 IDL instructions on `lee_core` v0.3.1 with per-instruction tests, a generated IDL and CI. | [#3](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/3) (closed) |
 | 2 · Upgrade and deploy | 4 | Done. Deployed to a local sequencer with `logos-scaffold` and a successful `Initialize` call recorded in [docs/deploy.md](./docs/deploy.md). Public testnet deployment is deferred by decision. | [#4](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/4) (closed) |
 | 3 · Core and UI wiring | 5–7 | Done. `sacco_core` submits IDL instructions through the LEZ wallet; Member, Committee and Auditor views run in Basecamp; the demo flow is captured in [docs/screenshots/issue-5/](./docs/screenshots/issue-5/). | [#5](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/5) (closed) |
-| 4 · Privacy | 7–8 | In progress. Design option C (group-held private accounts, with a viewing key for the Supervisory Committee) is chosen on the issue; the member privacy explainer is in review in [PR #22](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/22). Member balances are still in public accounts. | [#6](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/6) (open) |
-| 5 · Storage and Messaging | 8–9 | Not started. | [#7](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/7) (open) |
-| 6 · Package and publish | 9 | Not started. Local `.lgx` builds install into Basecamp; signed packages and the `logos-repo.json` index are not done. | [#8](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/8) (open) |
-| 7 · Pilot and report | 10–12 | Not started. | [#9](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/9) (open) |
+| 4 · Privacy | 7–8 | Tracked by the phase owners in the issue. | [#6](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/6) (open) |
+| 5 · Storage and Messaging | 8–9 | Tracked by the phase owners in the issue. | [#7](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/7) (open) |
+| 6 · Package and publish | 9 | Tracked by the phase owners in the issue. | [#8](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/8) (open) |
+| 7 · Pilot and report | 10–12 | Tracked by the phase owners in the issue. | [#9](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/9) (open) |
 
 ## Roadmap
 
