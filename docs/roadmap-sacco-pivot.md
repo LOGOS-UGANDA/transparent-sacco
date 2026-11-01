@@ -9,9 +9,9 @@ The start-to-finish map for Logos Circle Kampala's winnable issue: what we build
 | Problem | SACCO members cannot see how savings, loans and expenses are handled, so trust is low. |
 | Solution | A Logos app where every deposit, loan and expense is recorded and approved on chain, with members' personal finances kept private. |
 | Circle | Logos Circle Kampala |
-| Repo | `https://github.com/LOGOS-UGANDA/-Transparent-SACCO-Funds-Management` |
+| Repo | `https://github.com/LOGOS-UGANDA/transparent-sacco` |
 | Plan | 12 steps |
-| Status | Phase 0, scoping |
+| Status | Phases 1–3 done; Phase 4 (privacy) in progress; Phase 0 pilot sign-off and baseline survey outstanding. Per-phase table in the [README](../README.md#status). |
 | Scope (v1) | Deposits, loans and expenses. Investments (Wazalendo-style investment arms) are out of scope for v1. |
 
 > **What winning means:** A real SACCO using the tool, members checking it, and measured results reported publicly. Strong code alone does not win a Circles issue.
@@ -35,7 +35,7 @@ Real money still moves through mobile money or cash. The chain is the shared, ta
 
 ## Phases and tasks
 
-Ticks show work already done.
+Ticks show work that is merged on `main` or confirmed on a closed phase issue. Unticked items are not done yet.
 
 ### Phase 0: Scope and validate — Steps 1
 
@@ -43,10 +43,12 @@ Ticks show work already done.
 |---|---|---|---|
 | 1 | Community and pilot | Circles method | One pilot SACCO has signed off on three flows and the metrics. |
 
+**Status:** partly done ([#2](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/2) is closed). The pilot agreement and baseline survey are still field work. The pilot kit — agreement template, metrics and survey, workstream owners — is under review in [PR #19](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/19) and is not on `main` yet.
+
 - [x] Field research at SACCOs around Kampala *(field research report)*
 - [x] Workstreams formed *(workstreams report)*
 - [ ] Pick one pilot SACCO and get written agreement
-- [ ] Lock scope to three flows: deposits, loans, expenses
+- [x] Lock scope to three flows: deposits, loans, expenses *(Scope (v1) row above)*
 - [ ] Agree 2–3 metrics and run a baseline trust survey
 - [ ] Name an owner for each workstream
 
@@ -56,17 +58,19 @@ Ticks show work already done.
 |---|---|---|---|
 | 2–4 | Logos Blockchain integration | LEZ (Rust, RISC Zero) | `sacco_ledger` passes tests for every instruction. |
 
+**Status:** done ([#3](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/3) closed; PRs [#18](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/18) and [#21](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/21)).
+
 - [x] SACCO attestation ledger, governance, and multi-sig approval checks exist; SACCO funds stay off chain (`sacco_ledger`)
 - [x] Program IDL exported (`artifacts/`)
-- [ ] Bump `lee_core` to v0.3, fix breakages and deploy a hello-world program
+- [x] Bump `lee_core` to v0.3, fix breakages and deploy a hello-world program
 - [x] Rename the former fee-transparency program to `sacco_ledger` and remove university-fee concepts from the LEZ program
-- [ ] Add SACCO, Member, Committee and Supervisory Committee accounts (approvers separate from supervisors)
-- [ ] Make approver thresholds and role composition configurable per SACCO
-- [ ] Add `RecordDeposit` with treasurer record and member confirmation
-- [ ] Add loans: `ApplyLoan`, `ApproveLoan`, `DisburseLoan`, `RecordRepayment`
-- [ ] Adapt release flow into `ProposeExpense`, approve, `ExecuteExpense`
-- [ ] Add `PostPeriodSummary` for period totals
-- [ ] Unit tests per instruction plus CI running `RISC0_DEV_MODE=1 cargo test`
+- [x] Add SACCO, Member, Committee and Supervisory Committee accounts (approvers separate from supervisors)
+- [x] Make approver thresholds and role composition configurable per SACCO
+- [x] Add `RecordDeposit` with treasurer record and member confirmation
+- [x] Add loans: `ApplyLoan`, `ApproveLoan`, `DisburseLoan`, `RecordRepayment`
+- [x] Adapt release flow into `ProposeExpense`, approve, `ExecuteExpense`
+- [x] Add `PostPeriodSummary` for period totals
+- [x] Unit tests per instruction plus CI running `RISC0_DEV_MODE=1 cargo test`
 
 ### Phase 2: Upgrade and deploy — Steps 4
 
@@ -74,9 +78,11 @@ Ticks show work already done.
 |---|---|---|---|
 | 4 | Logos Blockchain integration | Local LEZ sequencer, `logos-scaffold` | Program deployed locally and a ledger instruction call works. |
 
+**Status:** done ([#4](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/4) closed). The local program ID and the successful `Initialize` call are recorded in [`docs/deploy.md`](./deploy.md) and [`programs/sacco_ledger/README.md`](../programs/sacco_ledger/README.md).
+
 - [x] Switch docs and scripts from `logoscore`/`lgpm` to `logosctl`
-- [ ] Deploy to local sequencer with `logos-scaffold`
-- [ ] Defer public testnet deployment until the local product flow works and the team chooses to proceed; it is not required for development
+- [x] Deploy to local sequencer with `logos-scaffold`, record the program ID and run a successful `Initialize` call
+- [x] Defer public testnet deployment until the local product flow works and the team chooses to proceed; it is not required for development
 
 ### Phase 3: Core and UI wiring — Steps 5–7
 
@@ -84,18 +90,22 @@ Ticks show work already done.
 |---|---|---|---|
 | 5–7 | Backend and Frontend | Logos Core module, QML UI, Basecamp | One full flow works end to end inside Basecamp. |
 
-- [x] `sacco_core` and `sacco_ui` scaffolds exist *(placeholder JSON only)*
-- [ ] Wire `sacco_core` to LEZ through the IDL
-- [ ] Member view: my deposits, my loan, SACCO totals
-- [ ] Treasurer and committee view: record, propose, approve
-- [ ] Auditor view: full trail with evidence links
-- [ ] Demo flow: deposit, member views it, expense passes multi-sig
+**Status:** done ([#5](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/5) closed; PRs [#20](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/20), [#23](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/23) and [#24](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/24)). Demo screenshots are in [`docs/screenshots/issue-5/`](./screenshots/issue-5/).
+
+- [x] `sacco_core` and `sacco_ui` scaffolds exist
+- [x] Wire `sacco_core` to LEZ through the IDL
+- [x] Member view: my deposits, my loan, SACCO totals
+- [x] Treasurer and committee view: record, propose, approve
+- [x] Auditor view: full trail with evidence links
+- [x] Demo flow: deposit, member views it, expense passes multi-sig *(member deposit confirmation included)*
 
 ### Phase 4: Privacy — Steps 7–8
 
 | Steps | Lead workstream | Logos pieces | Done when |
 |---|---|---|---|
 | 7–8 | Logos Blockchain integration | LEZ private accounts | Individual balances are private; SACCO totals stay public. |
+
+**Status:** in progress ([#6](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/6) open). Design option C — group-held private accounts, with the treasurer and credit committee as custodians and a viewing-only key for the Supervisory Committee — is chosen on the issue. No private-account code is merged yet, so member balances are still public. The explainer draft is in review in [PR #22](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/22) and is not merged.
 
 - [ ] Move member balances and loans to private accounts
 - [ ] Give auditor a view path for private data
@@ -108,6 +118,8 @@ Ticks show work already done.
 |---|---|---|---|
 | 8–9 | Backend | Logos Storage, Logos Messaging | Receipts stored by CID and members get alerts. |
 
+**Status:** not started ([#7](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/7) open).
+
 - [ ] Upload receipts, loan agreements and minutes to Logos Storage
 - [ ] Replace the free-text `evidenceHash` with the stored CID
 - [ ] Member alerts: deposit recorded, loan approved, expense proposed
@@ -119,6 +131,8 @@ Ticks show work already done.
 |---|---|---|---|
 | 9 | Frontend | `.lgx` packages, `logos-repo.json` | Anyone can install the app from Basecamp. |
 
+**Status:** not started ([#8](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/8) open).
+
 - [ ] Build signed `.lgx` packages
 - [ ] Fill `indexUrl` and fix the homepage in `logos-repo.json`
 - [ ] Post the repo link on the Basecamp module forum thread
@@ -128,6 +142,8 @@ Ticks show work already done.
 | Steps | Lead workstream | Logos pieces | Done when |
 |---|---|---|---|
 | 10–12 | Community and pilot | Circles reporting | Public report with metrics posted on the Logos forum. |
+
+**Status:** not started ([#9](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/9) open).
 
 - [ ] Train treasurer and committee at the pilot SACCO
 - [ ] Run the pilot with real members
@@ -197,10 +213,10 @@ From the Logos Circles guide; about 80 percent ticked means the issue is winnabl
 ## Open questions
 
 1. Which SACCO is the pilot partner, and who signs for it?
-2. Does the v0.2.0 LEZ code compile against testnet v0.3?
+2. Does the v0.2.0 LEZ code compile against testnet v0.3? *(Partly answered in Phase 1: `sacco_ledger` builds and tests on `lee_core` v0.3.1 after PR #21 and runs on the local sequencer; it has not been deployed to the public testnet.)*
 3. Which is the main repo: upstream `makmot256`, the LOGOS-UGANDA fork, or `kaksv/Transparent-Sacco-on-logos`?
 4. What came out of the recent SACCO Build Sprint at Makerere?
-5. Should `RecordDeposit` distinguish share capital from savings? *(Phase 1 kickoff)*
+5. Should `RecordDeposit` distinguish share capital from savings? *(Answered in Phase 1: yes — `deposit_type` is `Savings` or `ShareCapital`.)*
 6. What is the recovery path when a member exits or dies — how are private balances returned to beneficiaries? *(Phase 4 privacy)*
 7. Which SACCO is realistically reachable for a pilot — institutional ones restrict membership, so is a community or trader SACCO more accessible?
 8. What record-keeping and reporting obligations follow from SACCO registration with URSB?
@@ -215,7 +231,7 @@ From the Logos Circles guide; about 80 percent ticked means the issue is winnabl
 
 ## References
 
-- [Project repo](https://github.com/LOGOS-UGANDA/-Transparent-SACCO-Funds-Management) — github.com
+- [Project repo](https://github.com/LOGOS-UGANDA/transparent-sacco) — github.com
 - [Logos docs](https://docs.logos.co) — docs.logos.co
 - [Write and deploy an LEZ program](https://docs.logos.co/lez/programs/write-and-deploy-lez-program-with-scaffold) — docs.logos.co
 - [Build a Logos Core module](https://docs.logos.co/core/build-modules/build-and-run-a-logos-core-module) — docs.logos.co

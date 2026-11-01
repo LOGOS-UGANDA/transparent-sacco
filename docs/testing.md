@@ -7,12 +7,14 @@ What you can verify today, and how Basecamp fits in.
 | Layer | Testable now? | What “working” means |
 |-------|---------------|----------------------|
 | Legacy UX prototype (`prototype/`) | Yes, as a demo only | Old Hardhat fee-custody flows; does not test the current SACCO ledger |
-| LEZ program (host handlers) | Partially | `cargo test` once LEZ deps resolve |
-| LEZ program on-chain | Not yet | Needs guest build, deployment, and an IDL transaction runner |
-| `sacco_core` / `sacco_ui` in Basecamp | Not yet packaged | Need Nix → `.lgx`, then install/load |
-| SACCO ledger flow | Not yet | Needs core ↔ LEZ wiring for attesting off-chain deposits, loans, and expenses |
+| LEZ program (host handlers) | Yes | `RISC0_DEV_MODE=1 cargo test --workspace` in `programs/` passes; CI runs it with clippy and the IDL drift check |
+| LEZ program on-chain | Yes, on a local sequencer | Guest built, deployed with `logos-scaffold`, and `Initialize` verified; see [deploy.md](./deploy.md) |
+| `sacco_core` / `sacco_ui` in Basecamp | Yes, local `.lgx` | `lgs basecamp build --variant lgx` and `lgs basecamp install` build and install the modules declared in `scaffold.toml` |
+| SACCO ledger flow | Yes, the Phase 3 demo flow | In Basecamp: record a deposit, the member sees and confirms it, an expense passes multi-sig and is executed; captured in [screenshots/issue-5/](./screenshots/issue-5/) |
+| Private member accounts | Not yet | Phase 4 ([issue #6](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/6)) |
+| Published install from a package repository | Not yet | Phase 6 ([issue #8](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/8)) |
 
-Basecamp is the right place to **eventually** exercise the product UI + modules. It is also useful **today** to learn the stack (wallet, LEZ, Package Manager) even before our modules ship.
+Basecamp is where the product UI and modules are exercised, and it is also useful for learning the stack (wallet, LEZ, Package Manager).
 
 ---
 
@@ -25,7 +27,7 @@ Basecamp is the right place to **eventually** exercise the product UI + modules.
 5. Optionally try a third-party module from a community repo:
    **Settings → Package Repositories → Add** a URL from the [forum thread](https://forum.logos.co/t/basecamp-module-repository-links/1843), then install from Applications.
 
-This does **not** prove Transparent SACCO yet; it proves your Basecamp + LEZ environment works.
+This does **not** test Transparent SACCO itself; it proves your Basecamp + LEZ environment works.
 
 ---
 
@@ -52,7 +54,7 @@ cd programs
 RISC0_DEV_MODE=1 cargo test -p sacco_ledger_program
 ```
 
-The program can be built and deployed using the steps in [`sacco_ledger/README.md`](../programs/sacco_ledger/README.md). A client runner for submitting the current IDL instructions is not yet implemented. Future calls will record and approve off-chain SACCO activity; they will not deposit or transfer SACCO funds.
+The program can be built and deployed using the steps in [`sacco_ledger/README.md`](../programs/sacco_ledger/README.md) and [deploy.md](./deploy.md). The repository's local Rust client (`programs/sacco_ledger/client`) submits IDL instructions and reads account shards; see [`modules/sacco_core/API.md`](../modules/sacco_core/API.md). These calls record and approve off-chain SACCO activity; they do not deposit or transfer SACCO funds.
 
 Use the local sequencer for development. The current local workflow needs no public testnet wallet or test tokens. Public testnet deployment is deferred, is not needed to build the product, and is not part of the current test steps. See [architecture.md](./architecture.md), the [superseded custody proposal](./custody.md), and [idl.md](./idl.md).
 
@@ -67,7 +69,7 @@ cd modules/sacco_ui
 nix run    # logos-standalone-app preview
 ```
 
-Expect: shell UI, status/demo buttons. Until `sacco_core` is installed alongside, core calls may fail — that is expected until both modules are packaged together.
+Expect: the ledger-context form and the Member, Committee and Auditor tabs. Core calls fail unless `sacco_core` and its `lez_core` and `lez_indexer_module` dependencies are installed alongside; the Basecamp path in section E installs them together.
 
 ### Core via `logosctl`
 
@@ -81,15 +83,15 @@ logosctl call sacco_core getStatus
 logosctl daemon stop
 ```
 
-The `sacco_core` fee-payment and release methods are legacy placeholders and return **scaffold JSON**, not chain transactions. Use `getStatus` to verify module loading; these legacy methods do not represent current product operations.
+Use `getStatus` to verify module loading. Ledger methods need a configured wallet and ledger context (`setLedgerContext`) and the `lez_core` dependency; see [`modules/sacco_core/API.md`](../modules/sacco_core/API.md).
 
 Official walkthrough: [Build and run a Logos core module](https://docs.logos.co/core/build-modules/build-and-run-a-logos-core-module).
 
 ---
 
-## E. Test in Basecamp (when `.lgx` builds succeed)
+## E. Test in Basecamp
 
-This is the procedure you asked for.
+The path used for the Phase 3 demo is `lgs basecamp build --variant lgx` followed by `lgs basecamp install`, which builds the modules declared in `scaffold.toml` and installs them into the local Basecamp profiles. The manual steps below install the same packages by hand.
 
 ### Prerequisites
 
@@ -120,20 +122,17 @@ In Basecamp, use **Package Manager → Install LGX Package** and select the `.lg
 1. Restart Basecamp (or use Modules view → Load).
 2. Confirm `sacco_core` under Core Modules and `sacco_ui` under UI Modules / Applications.
 3. Open Transparent SACCO UI.
-4. Click **Refresh status** → should show scaffold ready string.
-5. The visible legacy demo buttons return scaffold JSON; they do not send transactions or move SACCO funds.
+4. Set the ledger context (program, SACCO, fee payer and signer accounts) against the local sequencer from [deploy.md](./deploy.md).
 
-### 4. Pass criteria (current scaffold)
+### 4. Pass criteria (Phase 3 demo flow)
 
-- Modules install without variant errors
-- UI opens
-- `getStatus` works; any legacy demo button returns scaffold JSON only
+- Modules install without variant errors and the UI opens with the Member, Committee and Auditor tabs
+- Committee tab: `RecordDeposit` saves a savings deposit
+- Member tab: the deposit is visible and **Confirm deposit** marks it confirmed
+- Committee tab: an expense is proposed, approved by the required approvers, and executed; its status shows the approval count
+- Deposits and expenses are readable as public accounts on the local sequencer
 
-### 5. Pass criteria (after LEZ wiring — future)
-
-- `RecordDeposit` updates member and SACCO totals (savings vs share capital split)
-- Multi-sig approval → `ExecuteExpense` records evidence that an off-chain payment happened
-- Deposits, loans and expenses verifiable via public accounts / explorer
+These were last verified for the Phase 3 demo; see [screenshots/issue-5/](./screenshots/issue-5/). Private member balances (Phase 4) are not covered yet.
 
 ---
 
@@ -151,6 +150,7 @@ When `logos-repo.json` has a real `indexUrl`:
 
 1. Basecamp stack rehearsal (A)
 2. Prototype UX (B) if you care about screens
-3. Package + install modules in Basecamp (E) for shell/API smoke
-4. LEZ program tests + deploy (C)
-5. Wire `sacco_core` → IDL/wallet for attestation of off-chain activity; do not add SACCO fund custody or transfers
+3. LEZ program tests + local deploy (C)
+4. Package + install modules in Basecamp and run the demo flow (E)
+
+The product records off-chain activity; do not add SACCO fund custody or transfers.

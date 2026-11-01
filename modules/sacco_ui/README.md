@@ -1,6 +1,6 @@
 # sacco_ui
 
-Logos **UI module scaffold** (QML) for Transparent SACCO.
+Logos **UI module** (QML) for Transparent SACCO.
 
 The product records off-chain deposits, loans, and expenses on LEZ. SACCO
 money is not deposited into or transferred by this application.
@@ -9,9 +9,15 @@ money is not deposited into or transferred by this application.
 
 Desktop UI hosted by Basecamp or `logos-standalone-app`. Calls `sacco_core` through the Logos bridge (`logos.callModule`) — QML stays sandboxed (no direct network).
 
-## Screens (scaffold)
+## Screens
 
-Current `Main.qml` is a placeholder shell. Its fee-payment and payment-lookup buttons are legacy demos that return scaffold JSON; they do not represent the SACCO ledger flow and submit no LEZ transactions. Replace them with screens for recording and reviewing off-chain activity and its on-chain approvals. The React/Hardhat `prototype/` is a superseded custody demo, not a source for current product behavior.
+`qml/Main.qml` sets the ledger context (program, SACCO, fee payer and signer accounts) and hosts three role tabs:
+
+- **Member** (`MemberView.qml`): SACCO totals, the member's savings and share capital, loading and confirming a deposit, the member's loans, and applying for a loan
+- **Committee** (`CommitteeView.qml`): record deposits, propose expenses, approve or reject loans and expenses, set the approval threshold, execute expenses, and record loan disbursements and repayments
+- **Auditor** (`AuditorView.qml`): the audit trail, read as the SACCO account's transaction history from the indexer
+
+Every action goes through `sacco_core`, which submits the matching `sacco_ledger` instruction. The Phase 3 demo flow is captured in [`docs/screenshots/issue-5/`](../../docs/screenshots/issue-5/). The React/Hardhat `prototype/` is a superseded custody demo, not a source for current product behavior.
 
 ## Build / preview
 
