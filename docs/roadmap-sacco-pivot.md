@@ -11,7 +11,7 @@ The start-to-finish map for Logos Circle Kampala's winnable issue: what we build
 | Circle | Logos Circle Kampala |
 | Repo | `https://github.com/LOGOS-UGANDA/transparent-sacco` |
 | Plan | 12 steps |
-| Status | Phases 1–3 done; Phase 4 (privacy) in progress; Phase 0 pilot sign-off and baseline survey outstanding. Per-phase table in the [README](../README.md#status). |
+| Status | Phases 1–3 done; Phase 0 pilot sign-off and baseline survey outstanding. Per-phase table in the [README](../README.md#status). |
 | Scope (v1) | Deposits, loans and expenses. Investments (Wazalendo-style investment arms) are out of scope for v1. |
 
 > **What winning means:** A real SACCO using the tool, members checking it, and measured results reported publicly. Strong code alone does not win a Circles issue.
@@ -105,8 +105,6 @@ Ticks show work that is merged on `main` or confirmed on a closed phase issue. U
 |---|---|---|---|
 | 7–8 | Logos Blockchain integration | LEZ private accounts | Individual balances are private; SACCO totals stay public. |
 
-**Status:** in progress ([#6](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/6) open). Design option C — group-held private accounts, with the treasurer and credit committee as custodians and a viewing-only key for the Supervisory Committee — is chosen on the issue. No private-account code is merged yet, so member balances are still public. The explainer draft is in review in [PR #22](https://github.com/LOGOS-UGANDA/transparent-sacco/pull/22) and is not merged.
-
 - [ ] Move member balances and loans to private accounts
 - [ ] Give auditor a view path for private data
 - [ ] Keep SACCO totals, loan-book totals and expenses public
@@ -117,8 +115,6 @@ Ticks show work that is merged on `main` or confirmed on a closed phase issue. U
 | Steps | Lead workstream | Logos pieces | Done when |
 |---|---|---|---|
 | 8–9 | Backend | Logos Storage, Logos Messaging | Receipts stored by CID and members get alerts. |
-
-**Status:** not started ([#7](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/7) open).
 
 - [ ] Upload receipts, loan agreements and minutes to Logos Storage
 - [ ] Replace the free-text `evidenceHash` with the stored CID
@@ -131,8 +127,6 @@ Ticks show work that is merged on `main` or confirmed on a closed phase issue. U
 |---|---|---|---|
 | 9 | Frontend | `.lgx` packages, `logos-repo.json` | Anyone can install the app from Basecamp. |
 
-**Status:** not started ([#8](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/8) open).
-
 - [ ] Build signed `.lgx` packages
 - [ ] Fill `indexUrl` and fix the homepage in `logos-repo.json`
 - [ ] Post the repo link on the Basecamp module forum thread
@@ -142,8 +136,6 @@ Ticks show work that is merged on `main` or confirmed on a closed phase issue. U
 | Steps | Lead workstream | Logos pieces | Done when |
 |---|---|---|---|
 | 10–12 | Community and pilot | Circles reporting | Public report with metrics posted on the Logos forum. |
-
-**Status:** not started ([#9](https://github.com/LOGOS-UGANDA/transparent-sacco/issues/9) open).
 
 - [ ] Train treasurer and committee at the pilot SACCO
 - [ ] Run the pilot with real members
